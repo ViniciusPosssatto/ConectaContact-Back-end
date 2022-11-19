@@ -72,5 +72,5 @@ def callback():
 	del user_google_dict["azp"]
 
 	token = generate_token_jwt(user_google_dict)
-
-	return redirect(f"{current_app.config['FRONTEND_URL']}#/home/?jwt={token}&name={name}")
+	
+	return redirect(f"{os.getenv('FRONTEND_URL')}#/home/?jwt={token}&name={name}")
