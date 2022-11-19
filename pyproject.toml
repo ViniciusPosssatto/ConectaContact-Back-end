@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "conectacontact-back-end"
+version = "0.1.0"
+description = "API Rest em python e flask"
+authors = ["ViniciusPosssatto <101053966+ViniciusPosssatto@users.noreply.github.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+Flask = "^2.2.2"
+python-dotenv = "^0.21.0"
+requests = "^2.28.1"
+PyJWT = "^2.6.0"
+Flask-Cors = "^3.0.10"
+pymongo = "^4.3.2"
+pydantic = "^1.10.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+autopep8 = "^2.0.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
