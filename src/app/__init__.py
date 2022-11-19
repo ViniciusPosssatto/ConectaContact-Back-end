@@ -8,6 +8,7 @@ from src.app.models import create_collection_users_login
 
 
 mongo = MongoClient(os.getenv("MONGO_URI"), tls=True, tlsCAFile=certifi.where())
+mongo_client = mongo["conecta-contact"]
 
 
 def create_app(environment):
