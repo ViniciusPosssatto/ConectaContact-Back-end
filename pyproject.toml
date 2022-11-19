@@ -13,6 +13,8 @@ PyJWT = "^2.6.0"
 Flask-Cors = "^3.0.10"
 pymongo = "^4.3.2"
 pydantic = "^1.10.2"
+google-auth-oauthlib = "^0.7.1"
+google-auth = "^2.14.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
