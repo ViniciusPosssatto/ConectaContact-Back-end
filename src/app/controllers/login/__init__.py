@@ -1,15 +1,13 @@
 import os
 import json
 import requests
+from bson import json_util, ObjectId
 from datetime import datetime, timedelta
-from flask import Blueprint, request, current_app
+from flask import Blueprint, request
 from flask.globals import session
 from flask.wrappers import Response
 from google_auth_oauthlib.flow import Flow
 from google.oauth2 import id_token
-from google.oauth2.credentials import Credentials
-from google.auth.transport.requests import Request
-from google_auth_oauthlib.flow import InstalledAppFlow
 from google import auth
 from werkzeug.utils import redirect
 from src.app.utils import generate_token_jwt, set_new_password
@@ -60,7 +58,7 @@ def callback():
 		audience=os.getenv("GOOGLE_CLIENT_ID"),
 	)
 	email = user_google_dict["email"]
-	name = user_google_dict["name"]
+	user_name = user_google_dict["name"]
 	user = mongo_client.users_login.find_one({"email": email})
 
 
@@ -74,11 +72,10 @@ def callback():
 	del user_google_dict["given_name"]
 	del user_google_dict["family_name"]
 
-	token = generate_token_jwt(user_google_dict)
 
 	if not user:
 		new_user = {
-			'name': name,
+			'name': user_name,
 			'email': email,
 			'password': set_new_password()
 		}
@@ -94,7 +91,7 @@ def callback():
 		service = build('people', 'v1', credentials=credentials)
 		results = service.people().connections().list(
 			resourceName='people/me',
-			pageSize=10,
+			pageSize=2000,
 			personFields='names,emailAddresses,photos').execute()
 		connections = results.get('connections', [])
 		contacts = []
@@ -105,12 +102,12 @@ def callback():
 			if email:
 				if not person.get("names"):
 					name = email[0].get("value")
-					contacts.append({"name": name, "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("email")})
+					contacts.append({"name": name, "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("_id")})
 				else:
-					contacts.append({"name": names[0].get('displayName'), "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("email")})
+					contacts.append({"name": names[0].get('displayName'), "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("_id")})
 		
 		for contact in contacts:
-			contact_exists =  mongo_client.contacts.find_one({"email": contact.get("email"), "id_user": user.get('email')})
+			contact_exists =  mongo_client.contacts.find_one({"email": contact.get("email"), "id_user": ObjectId(user.get('_id'))})
 			if not contact_exists: 
 				mongo_client.contacts.insert_one(contact)
 
@@ -119,18 +116,24 @@ def callback():
 		# 	pageSize=10, 
 		# 	readMask="names,emailAddresses,photos"
 		# ).execute()
+		user_google_dict["id_user"] = str(user.get("_id"))
+		
+		token = generate_token_jwt(user_google_dict)
 
 
 		return Response(
-		response=json.dumps(contacts),
+		response=json_util.dumps(contacts),
 		status=200,
 		mimetype="application/json",
 	)
+	except HttpError as err:
+		print("error HTTPerror ="  , err)
 	except Exception as err:
+		print("error Exception ="  , err)
 		return Response(
-		response=json.dumps({"error": err}),
+		response={"error": err},
 		status=400,
 		mimetype="application/json",
 	)
-	# finally:
-	# 	return redirect(f"{os.getenv('FRONTEND_URL')}#/home/?jwt={token}&name={name}")
+	finally:
+	 	return redirect(f"{os.getenv('FRONTEND_URL')}#/home/?jwt={token}")
