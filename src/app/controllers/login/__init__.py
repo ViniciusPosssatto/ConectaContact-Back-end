@@ -3,14 +3,11 @@ import json
 import requests
 from bson import json_util, ObjectId
 from datetime import datetime, timedelta
-from flask import Blueprint, request, current_app
+from flask import Blueprint, request
 from flask.globals import session
 from flask.wrappers import Response
 from google_auth_oauthlib.flow import Flow
 from google.oauth2 import id_token
-from google.oauth2.credentials import Credentials
-from google.auth.transport.requests import Request
-from google_auth_oauthlib.flow import InstalledAppFlow
 from google import auth
 from werkzeug.utils import redirect
 from src.app.utils import generate_token_jwt, set_new_password
@@ -61,7 +58,7 @@ def callback():
 		audience=os.getenv("GOOGLE_CLIENT_ID"),
 	)
 	email = user_google_dict["email"]
-	name = user_google_dict["name"]
+	user_name = user_google_dict["name"]
 	user = mongo_client.users_login.find_one({"email": email})
 
 
@@ -78,7 +75,7 @@ def callback():
 
 	if not user:
 		new_user = {
-			'name': name,
+			'name': user_name,
 			'email': email,
 			'password': set_new_password()
 		}
@@ -138,5 +135,5 @@ def callback():
 		status=400,
 		mimetype="application/json",
 	)
-	# # finally:
-	# 	return redirect(f"{os.getenv('FRONTEND_URL')}#/home/?jwt={token}&name={name}")
+	finally:
+	 	return redirect(f"{os.getenv('FRONTEND_URL')}#/home/?jwt={token}")
