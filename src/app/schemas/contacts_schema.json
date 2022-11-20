@@ -1,0 +1,27 @@
+{
+    "$jsonSchema": {
+        "bsonType": "object",
+        "title": "Validação de dados de contatos",
+        "required": [ 
+          "_id",
+          "name",
+          "email",
+          "photo",
+          "id_user"
+        ],
+        "properties": {
+          "name": {
+            "bsonType": "string",
+            "description": "Nome é obrigatório"
+          },
+          "email": {
+            "bsonType": "string",
+            "description": "Email deve ser string"
+          },
+          "photo": {
+            "bsonType": "string",
+            "description": "Photos obrigatória e deve ser string"
+          }
+        }
+      }
+  }

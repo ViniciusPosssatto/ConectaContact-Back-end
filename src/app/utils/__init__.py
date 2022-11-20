@@ -2,6 +2,7 @@ from jwt import encode
 from flask import current_app
 from werkzeug.security import check_password_hash, generate_password_hash
 import uuid
+import json
 
 
 def generate_token_jwt(payload):
@@ -16,3 +17,13 @@ def set_new_password():
 
 def validate_password(password_hash, password):
     return check_password_hash(password_hash, password)
+
+
+def read_validator_schema_for_models(directory, collection):
+    try:
+        with open(f'src/app/{directory}/{collection}.json', 'r') as f:
+            json_object = json.load(f)
+            return json_object
+    except Exception as excp:
+        print("Erro na leitura do json: " + excp)
+        return None

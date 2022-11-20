@@ -61,7 +61,20 @@ def callback():
 	)
 	email = user_google_dict["email"]
 	name = user_google_dict["name"]
-	user = mongo_client.users.find_one({"email": email})
+	user = mongo_client.users_login.find_one({"email": email})
+
+
+	session["google_id"] = user_google_dict.get("sub")
+	session["exp"] = datetime.utcnow() + timedelta(days=1)
+	del user_google_dict["aud"]
+	del user_google_dict["azp"]
+	del user_google_dict["iss"]
+	del user_google_dict["sub"]
+	del user_google_dict["at_hash"]
+	del user_google_dict["given_name"]
+	del user_google_dict["family_name"]
+
+	token = generate_token_jwt(user_google_dict)
 
 	if not user:
 		new_user = {
@@ -70,24 +83,13 @@ def callback():
 			'password': set_new_password()
 		}
 		try:
-			user = mongo_client.users.insert_one(new_user)
-			return True
+			user = mongo_client.users_login.insert_one(new_user)
 		except Exception as exp:
 			return {"message": "Algo deu errado ao salvar novo usuário.", "error": exp}
+		finally:
+			user = mongo_client.users_login.find_one({"email": email})
 
-	session["google_id"] = user_google_dict.get("sub")
-	session["exp"] = datetime.utcnow() + timedelta(days=1)
-	del user_google_dict["aud"]
-	del user_google_dict["azp"]
-	del user_google_dict["iss"]
-	del user_google_dict["sub"]
-	del user_google_dict["hd"]
-	del user_google_dict["at_hash"]
-	del user_google_dict["given_name"]
-	del user_google_dict["family_name"]
-
-	token = generate_token_jwt(user_google_dict)
-	print(credentials)
+			
 	try:
 		service = build('people', 'v1', credentials=credentials)
 		results = service.people().connections().list(
@@ -95,19 +97,22 @@ def callback():
 			pageSize=10,
 			personFields='names,emailAddresses,photos').execute()
 		connections = results.get('connections', [])
-		nomes = []
-		emails = []
-		photos = []
+		contacts = []
 		for person in connections:
 			names = person.get('names', [])
 			email = person.get('emailAddresses', [])
 			photo = person.get("photos", [])
-			if names:
-				nomes.append(names[0].get('displayName'))
 			if email:
-				emails.append(email[0].get("value"))
-			if photo:
-				photos.append(photo[0].get("url"))
+				if not person.get("names"):
+					name = email[0].get("value")
+					contacts.append({"name": name, "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("email")})
+				else:
+					contacts.append({"name": names[0].get('displayName'), "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("email")})
+		
+		for contact in contacts:
+			contact_exists =  mongo_client.contacts.find_one({"email": contact.get("email"), "id_user": user.get('email')})
+			if not contact_exists: 
+				mongo_client.contacts.insert_one(contact)
 
 
 		# res = service.people().otherContacts().list(
@@ -117,14 +122,14 @@ def callback():
 
 
 		return Response(
-		response=json.dumps({"nomes": nomes, "emails": emails, "photos": photos}),
+		response=json.dumps(contacts),
 		status=200,
 		mimetype="application/json",
 	)
-	except HttpError as err:
+	except Exception as err:
 		return Response(
 		response=json.dumps({"error": err}),
-		status=200,
+		status=400,
 		mimetype="application/json",
 	)
 	# finally:
