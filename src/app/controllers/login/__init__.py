@@ -75,7 +75,6 @@ def callback():
 	del user_google_dict["given_name"]
 	del user_google_dict["family_name"]
 
-	token = generate_token_jwt(user_google_dict)
 
 	if not user:
 		new_user = {
@@ -120,6 +119,9 @@ def callback():
 		# 	pageSize=10, 
 		# 	readMask="names,emailAddresses,photos"
 		# ).execute()
+		user_google_dict["id_user"] = str(user.get("_id"))
+		
+		token = generate_token_jwt(user_google_dict)
 
 
 		return Response(
