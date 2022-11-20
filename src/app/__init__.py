@@ -16,10 +16,6 @@ def create_app(environment):
     app = Flask(__name__)
     app.config.from_object(app_config[environment])
     CORS(app)
-    # app.config.update(
-    #     TESTING=True,
-    #     SECRET_KEY=os.getenv("SECRET_KEY")
-    # )
  
     mongo_client = mongo["conecta-contact"]
     

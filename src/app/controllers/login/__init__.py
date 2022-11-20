@@ -108,6 +108,14 @@ def callback():
 				emails.append(email[0].get("value"))
 			if photo:
 				photos.append(photo[0].get("url"))
+
+
+		# res = service.people().otherContacts().list(
+		# 	pageSize=10, 
+		# 	readMask="names,emailAddresses,photos"
+		# ).execute()
+
+
 		return Response(
 		response=json.dumps({"nomes": nomes, "emails": emails, "photos": photos}),
 		status=200,
@@ -119,5 +127,5 @@ def callback():
 		status=200,
 		mimetype="application/json",
 	)
-	finally:
-		return redirect(f"{os.getenv('FRONTEND_URL')}#/home/?jwt={token}&name={name}")
+	# finally:
+	# 	return redirect(f"{os.getenv('FRONTEND_URL')}#/home/?jwt={token}&name={name}")
