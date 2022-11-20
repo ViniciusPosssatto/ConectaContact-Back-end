@@ -61,7 +61,7 @@ def callback():
 	)
 	email = user_google_dict["email"]
 	name = user_google_dict["name"]
-	user = mongo_client.users.find_one({"email": email})
+	user = mongo_client.users_login.find_one({"email": email})
 
 	if not user:
 		new_user = {
@@ -70,7 +70,7 @@ def callback():
 			'password': set_new_password()
 		}
 		try:
-			user = mongo_client.users.insert_one(new_user)
+			user = mongo_client.users_login.insert_one(new_user)
 			return True
 		except Exception as exp:
 			return {"message": "Algo deu errado ao salvar novo usuário.", "error": exp}
