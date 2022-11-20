@@ -1,5 +1,5 @@
 from flask import Flask
-from src.app.controllers import login
+from src.app.controllers.login import login
 
 
 def routes(app: Flask):
