@@ -1,6 +1,7 @@
 import os
 import json
 import requests
+from bson import json_util, ObjectId
 from datetime import datetime, timedelta
 from flask import Blueprint, request, current_app
 from flask.globals import session
@@ -94,7 +95,7 @@ def callback():
 		service = build('people', 'v1', credentials=credentials)
 		results = service.people().connections().list(
 			resourceName='people/me',
-			pageSize=10,
+			pageSize=2000,
 			personFields='names,emailAddresses,photos').execute()
 		connections = results.get('connections', [])
 		contacts = []
@@ -105,12 +106,12 @@ def callback():
 			if email:
 				if not person.get("names"):
 					name = email[0].get("value")
-					contacts.append({"name": name, "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("email")})
+					contacts.append({"name": name, "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("_id")})
 				else:
-					contacts.append({"name": names[0].get('displayName'), "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("email")})
+					contacts.append({"name": names[0].get('displayName'), "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("_id")})
 		
 		for contact in contacts:
-			contact_exists =  mongo_client.contacts.find_one({"email": contact.get("email"), "id_user": user.get('email')})
+			contact_exists =  mongo_client.contacts.find_one({"email": contact.get("email"), "id_user": ObjectId(user.get('_id'))})
 			if not contact_exists: 
 				mongo_client.contacts.insert_one(contact)
 
@@ -122,15 +123,18 @@ def callback():
 
 
 		return Response(
-		response=json.dumps(contacts),
+		response=json_util.dumps(contacts),
 		status=200,
 		mimetype="application/json",
 	)
+	except HttpError as err:
+		print("error HTTPerror ="  , err)
 	except Exception as err:
+		print("error Exception ="  , err)
 		return Response(
-		response=json.dumps({"error": err}),
+		response={"error": err},
 		status=400,
 		mimetype="application/json",
 	)
-	# finally:
+	# # finally:
 	# 	return redirect(f"{os.getenv('FRONTEND_URL')}#/home/?jwt={token}&name={name}")
