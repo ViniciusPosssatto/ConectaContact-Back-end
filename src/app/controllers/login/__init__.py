@@ -105,12 +105,12 @@ def callback():
 			if email:
 				if not person.get("names"):
 					name = email[0].get("value")
-					contacts.append({"name": name, "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("_id")})
+					contacts.append({"name": name, "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("email")})
 				else:
-					contacts.append({"name": names[0].get('displayName'), "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("_id")})
+					contacts.append({"name": names[0].get('displayName'), "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("email")})
 		
 		for contact in contacts:
-			contact_exists =  mongo_client.contacts.find_one({"email": contact.get("email")})
+			contact_exists =  mongo_client.contacts.find_one({"email": contact.get("email"), "id_user": user.get('email')})
 			if not contact_exists: 
 				mongo_client.contacts.insert_one(contact)
 
@@ -122,7 +122,7 @@ def callback():
 
 
 		return Response(
-		response=json.dumps({"contacts": "contacts"}),
+		response=json.dumps(contacts),
 		status=200,
 		mimetype="application/json",
 	)
