@@ -7,7 +7,7 @@ def create_collection_users_login(mongo_client):
 	try:
 		mongo_client.create_collection("users_login")
 	except Exception as e:
-		print({"msg": "Erro na model user_login", "error": e})
+		print({"msg": e})
 
 	mongo_client.command("collMod", "users_login", validator=users_login_validator)
 
@@ -19,6 +19,6 @@ def create_collection_contacts(mongo_client):
 	try:
 		mongo_client.create_collection("contacts")
 	except Exception as e:
-		print({"msg": "Erro na model contacts", "error": e})
+		print({"msg": e})
 
 	mongo_client.command("collMod", "contacts", validator=contacts_validator)
