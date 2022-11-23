@@ -18,16 +18,16 @@ from src.app.services import verify_and_save_contacts, insert_user_in_db, get_us
 
 login = Blueprint("login", __name__,  url_prefix="/login")
 
-os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
+CLIENT_SECRETS_OBJECT = os.environ.get("GOOGLE_CLIENT_SECRETS")
 
-flow = Flow.from_client_secrets_file(
-    client_secrets_file="src\\app\\utils\\client_secret.json",
+flow = Flow.from_client_config(
+    client_config=json.loads(CLIENT_SECRETS_OBJECT),
     scopes=[
-        "https://www.googleapis.com/auth/userinfo.email",
-        "https://www.googleapis.com/auth/userinfo.profile",
-		"https://www.googleapis.com/auth/contacts.other.readonly",
+			"https://www.googleapis.com/auth/userinfo.email",
+			"https://www.googleapis.com/auth/userinfo.profile",
+			"https://www.googleapis.com/auth/contacts.other.readonly",
     	"https://www.googleapis.com/auth/contacts.readonly",
-        "openid",
+      "openid",
     ],
     redirect_uri="http://localhost:5000/login/callback",
 )
@@ -129,4 +129,4 @@ def callback():
 		mimetype="application/json",
 	)
 	finally:
-	 	return redirect(f"{os.getenv('FRONTEND_URL')}#/home/?jwt={token}")
+	 	return redirect(f"{os.getenv('FRONTEND_URL')}/home/?jwt={token}")
