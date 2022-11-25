@@ -12,7 +12,7 @@ def get_user_exists(user_email):
 
 
 def get_contacts_exists(id_user):
-    results = mongo_client.contacts.find({"id_user": ObjectId(id_user)})
+    results = mongo_client.contacts.find({"id_user": ObjectId(id_user)}, {"_id":0, "id_user":0})
     return results
 
 
