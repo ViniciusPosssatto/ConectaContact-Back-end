@@ -56,6 +56,7 @@ def callback():
 		id_token=credentials.id_token,
 		request=token_google,
 		audience=os.getenv("GOOGLE_CLIENT_ID"),
+		clock_skew_in_seconds = 10
 	)
 	email = user_google_dict["email"]
 	user_name = user_google_dict["name"]
