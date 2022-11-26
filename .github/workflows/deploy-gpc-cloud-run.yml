@@ -17,16 +17,15 @@ env:
   GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
   RUN_REGION: southamerica-east1
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/conectacontactbackend:latest
 
 jobs:
 
-  deploy:
+  BuildAndDeploy:
 
     name: "Config GCP"
     runs-on: ubuntu-latest
-    env:
-      IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/conectacontactbackend:latest
-  
+
     steps:
       - name: Git Checkout
         uses: actions/checkout@v3
@@ -37,14 +36,17 @@ jobs:
           service_account_key: ${{ secrets.GCP_CREDENTIALS }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
-      - name: Configure Docker
-        run: gcloud auth configure-docker --quiet
-
-      - name: Docker Build Image
-        run: docker build -t $IMAGE_NAME .
+      – name: Build & Publish
+          run: |
+          gcloud config set project conectacontact
+          gcloud builds submit –tag $IMAGE_NAME
+          gcloud config set run/region $RUN_REGION
+      – name: Cloud Run
+          uses: google-github-actions/deploy-cloudrun@v0
+          with:
+            flags: “–port=8080"
+            image: $IMAGE_NAME
+            service: conectacontact
       
-      - name: Push Docker Image
-        run: docker push $IMAGE_NAME
-      
-      - name : Deploy Docker Image
-        run: gcloud run deploy conectacontact --image $IMAGE_NAME --port=8080 --region $RUN_REGION --set-env-vars FLASK_APP=app.py,FLASK_ENV=development,SECRET_KEY=algumseguredo,FRONTEND_URL=http://localhost:8080,OAUTHLIB_INSECURE_TRANSPORT=1
+      # - name : Deploy Docker Image
+      #   run: gcloud run deploy conectacontact --image $IMAGE_NAME --port=8080  --allow-unauthenticated --region $RUN_REGION --set-env-vars FLASK_APP=app.py,FLASK_ENV=development,SECRET_KEY=algumseguredo,FRONTEND_URL=http://localhost:8080,OAUTHLIB_INSECURE_TRANSPORT=1
