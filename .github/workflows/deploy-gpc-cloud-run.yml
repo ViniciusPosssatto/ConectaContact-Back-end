@@ -47,4 +47,4 @@ jobs:
         run: docker push $IMAGE_NAME
       
       - name : Deploy Docker Image
-        run: gcloud run deploy conectacontact --image $IMAGE_NAME --region $RUN_REGION
+        run: gcloud run deploy conectacontact --image $IMAGE_NAME --region $RUN_REGION --set-env-vars FLASK_APP=app.py,FLASK_ENV=development,SECRET_KEY=algumseguredo,FRONTEND_URL=http://localhost:8080,OAUTHLIB_INSECURE_TRANSPORT=1
