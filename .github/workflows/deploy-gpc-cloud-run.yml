@@ -46,13 +46,6 @@ jobs:
 
       - name: Push Docker Image
         run: docker push $IMAGE_NAME
-
-      – name: Cloud Run
-          uses: google-github-actions/deploy-cloudrun@v0
-          with:
-            flags: “--port=8080"
-            image: $IMAGE_NAME
-            service: conectacontact
-      
-      # - name : Deploy Docker Image
-      #   run: gcloud run deploy conectacontact --image $IMAGE_NAME --port=8080  --allow-unauthenticated --platform managed --region $RUN_REGION --set-env-vars FLASK_APP=app.py,FLASK_ENV=development,SECRET_KEY=algumseguredo,FRONTEND_URL=http://localhost:8080,OAUTHLIB_INSECURE_TRANSPORT=1
+        
+      - name : Deploy Docker Image
+        run: gcloud run deploy conectacontact --image $IMAGE_NAME --port=8080  --allow-unauthenticated --platform managed --region $RUN_REGION --set-env-vars FLASK_APP=app.py,FLASK_ENV=development,SECRET_KEY=algumseguredo,FRONTEND_URL=http://localhost:8080,OAUTHLIB_INSECURE_TRANSPORT=1
