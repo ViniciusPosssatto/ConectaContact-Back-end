@@ -21,7 +21,7 @@ env:
 
 jobs:
 
-  BuildAndDeploy:
+  deploy:
 
     name: "Config GCP"
     runs-on: ubuntu-latest
@@ -39,10 +39,10 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
 
       – name: Build & Publish
-          run: |
-            gcloud config set project conectacontact
-            gcloud builds submit –tag $IMAGE_NAME
-            gcloud config set run/region $RUN_REGION
+        run: |
+          gcloud config set project conectacontact
+          gcloud builds submit –tag $IMAGE_NAME
+          gcloud config set run/region $RUN_REGION
       – name: Cloud Run
           uses: google-github-actions/deploy-cloudrun@v0
           with:
