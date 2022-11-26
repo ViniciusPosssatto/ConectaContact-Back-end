@@ -17,7 +17,6 @@ env:
   GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
   RUN_REGION: southamerica-east1
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/conectacontactbackend:latest
 
 jobs:
 
@@ -25,46 +24,8 @@ jobs:
 
     name: "Config GCP"
     runs-on: ubuntu-latest
-    spec:
-      containerConcurrency: 80
-      timeoutSeconds: 300
-      serviceAccountName: 626571889159-compute@developer.gserviceaccount.com
-      containers:
-      - image: gcr.io/conectacontact/conectacontactbackend@sha256:448de02c49570b5614389f291b45efdc6563d9d29e0c76bc24fe5b137116fa42
-        ports:
-        - name: http1
-          containerPort: 8080
-        env:
-        - name: FLASK_APP
-          value: app.py
-        - name: FLASK_ENV
-          value: development
-        - name: SECRET_KEY
-          value: algumseguredo
-        - name: FRONTEND_URL
-          value: http://localhost:8080
-        - name: OAUTHLIB_INSECURE_TRANSPORT
-          value: '1'
-        - name: GOOGLE_CLIENT_SECRETS
-          valueFrom:
-            secretKeyRef:
-              key: '1'
-              name: GOOGLE_CLIENT_SECRETS
-        - name: GOOGLE_CLIENT_ID
-          valueFrom:
-            secretKeyRef:
-              key: '1'
-              name: GOOGLE_CLIENT_ID
-        - name: MONGO_URI
-          valueFrom:
-            secretKeyRef:
-              key: '1'
-              name: MONGO_URI
-        resources:
-          limits:
-            cpu: 1000m
-            memory: 512Mi
-      
+    env:
+      IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/conectacontactbackend:latest
   
     steps:
       - name: Git Checkout
@@ -86,4 +47,4 @@ jobs:
         run: docker push $IMAGE_NAME
       
       - name : Deploy Docker Image
-        run: gcloud run deploy conectacontact --image $IMAGE_NAME --region $RUN_REGION --set-env-vars FLASK_APP=app.py,FLASK_ENV=development,SECRET_KEY=algumseguredo,FRONTEND_URL=http://localhost:8080,OAUTHLIB_INSECURE_TRANSPORT=1
+        run: gcloud run deploy conectacontact --image $IMAGE_NAME --port 8080 --region $RUN_REGION --set-env-vars FLASK_APP=app.py,FLASK_ENV=development,SECRET_KEY=algumseguredo,FRONTEND_URL=http://localhost:8080,OAUTHLIB_INSECURE_TRANSPORT=1
