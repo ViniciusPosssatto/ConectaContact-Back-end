@@ -48,4 +48,4 @@ jobs:
         run: docker push $IMAGE_NAME
 
       - name : Deploy Docker Image
-        run: gcloud run deploy conectacontact --image $IMAGE_NAME --port 8080  --allow-unauthenticated --platform managed --region $RUN_REGION --set-env-vars FLASK_APP=app.py,FLASK_ENV=development,SECRET_KEY=algumseguredo,FRONTEND_URL=http://localhost:8080,OAUTHLIB_INSECURE_TRANSPORT=1
+        run: gcloud run deploy conectacontact --image $IMAGE_NAME --project $GCP_PROJECT_ID --args="PORT=8080" --port 8080  --allow-unauthenticated --platform managed --region $RUN_REGION --set-env-vars FLASK_APP=app.py,FLASK_ENV=development,SECRET_KEY=algumseguredo,FRONTEND_URL=http://localhost:8080,OAUTHLIB_INSECURE_TRANSPORT=1
