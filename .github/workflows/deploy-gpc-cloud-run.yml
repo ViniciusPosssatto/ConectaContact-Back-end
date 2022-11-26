@@ -25,6 +25,8 @@ jobs:
 
     name: "Config GCP"
     runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/labinventory:latest
 
     steps:
       - name: Git Checkout
@@ -38,9 +40,9 @@ jobs:
 
       – name: Build & Publish
           run: |
-          gcloud config set project conectacontact
-          gcloud builds submit –tag $IMAGE_NAME
-          gcloud config set run/region $RUN_REGION
+            gcloud config set project conectacontact
+            gcloud builds submit –tag $IMAGE_NAME
+            gcloud config set run/region $RUN_REGION
       – name: Cloud Run
           uses: google-github-actions/deploy-cloudrun@v0
           with:
