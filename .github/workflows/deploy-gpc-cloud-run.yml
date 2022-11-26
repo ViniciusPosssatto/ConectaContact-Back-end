@@ -1,3 +1,20 @@
+name: Deploy GCP
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  FLASK_APP: ${{ secrets.FLASK_APP }}
+  FLASK_ENV: ${{ secrets.FLASK_ENV }}
+  FLASK_DEBUG: ${{ secrets.FLASK_DEBUG }}
+  SECRET_KEY: ${{ secrets.SECRET_KEY }}
+  MONGO_URI: ${{ secrets.MONGO_URI }}
+  GOOGLE_CLIENT_SECRETS: ${{ secrets.GOOGLE_CLIENT_SECRETS }}
+  GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+  OAUTHLIB_INSECURE_TRANSPORT: ${{ secrets.OAUTHLIB_INSECURE_TRANSPORT }}
+  FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
