@@ -29,7 +29,7 @@ flow = Flow.from_client_config(
     	"https://www.googleapis.com/auth/contacts.readonly",
       "openid",
     ],
-    redirect_uri="http://localhost:5000/login/callback",
+    redirect_uri="https://conectacontactbackend-myb7gebzdq-rj.a.run.app/login/callback",
 )
 
 
