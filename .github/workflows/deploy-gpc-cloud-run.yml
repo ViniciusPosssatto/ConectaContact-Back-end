@@ -1,0 +1,77 @@
+name: Deploy GCP
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  FLASK_APP: ${{ secrets.FLASK_APP }}
+  FLASK_ENV: ${{ secrets.FLASK_ENV }}
+  FLASK_DEBUG: ${{ secrets.FLASK_DEBUG }}
+  SECRET_KEY: ${{ secrets.SECRET_KEY }}
+  MONGO_URI: ${{ secrets.MONGO_URI }}
+  GOOGLE_CLIENT_SECRETS: ${{ secrets.GOOGLE_CLIENT_SECRETS }}
+  GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+  OAUTHLIB_INSECURE_TRANSPORT: ${{ secrets.OAUTHLIB_INSECURE_TRANSPORT }}
+  FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+
+
+jobs:
+
+  deploy:
+
+    name: "Config GCP"
+    runs-on: ubuntu-latest
+    env:
+      IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/conectacontactbackend:latest
+      ports:
+        - name:http1
+          containerPort: 8080
+      env:
+        - name: FLASK_APP
+          value: app.py
+        - name: FLASK_ENV
+          value: development
+        - name: SECRET_KEY
+          value: algumseguredo
+        - name: FRONTEND_URL
+          value: http://localhost:8080
+        - name: OAUTHLIB_INSECURE_TRANSPORT
+          value: '1'
+        - name: GOOGLE_CLIENT_SECRETS
+          valueFrom:
+            secretKeyRef:
+              key: '1'
+              name: GOOGLE_CLIENT_SECRETS
+        - name: GOOGLE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: '1'
+              name: GOOGLE_CLIENT_ID
+        - name: MONGO_URI
+          valueFrom:
+            secretKeyRef:
+              key: '1'
+              name: MONGO_URI
+              
+    steps:
+      - name: Git Checkout
+        uses: actions/checkout@v3
+
+      - name: GCP Auth
+        uses: google-github-actions/setup-gcloud@v0.2.0
+        with:
+          service_account_key: ${{ secrets.GCP_CREDENTIALS }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker --quiet
+
+      - name: Docker Build Image
+        run: docker build -t $IMAGE_NAME .
+      
+      - name: Push Docker Image
+        run: docker push $IMAGE_NAME
+      
+      - name : Deploy Docker Image
+        run: gcloud run deploy site --image $IMAGE_NAME --region southamerica-east1
