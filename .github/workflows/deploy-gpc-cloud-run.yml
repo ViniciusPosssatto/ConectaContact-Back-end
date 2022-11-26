@@ -26,7 +26,7 @@ jobs:
       IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/conectacontactbackend:latest
       ports:
         - name:http1
-          containerPort: 8080
+          containerPort: '8080'
       env:
         - name: FLASK_APP
           value: app.py
@@ -74,4 +74,4 @@ jobs:
         run: docker push $IMAGE_NAME
       
       - name : Deploy Docker Image
-        run: gcloud run deploy site --image $IMAGE_NAME --region southamerica-east1
+        run: gcloud run deploy conectacontact --image $IMAGE_NAME --region southamerica-east1
