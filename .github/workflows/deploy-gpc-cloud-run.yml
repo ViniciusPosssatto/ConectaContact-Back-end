@@ -24,7 +24,36 @@ jobs:
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME: gcr.io/${{ secrets.GCP_PROJECT_ID }}/conectacontactbackend:latest
-
+      ports:
+        - name:http1
+          containerPort: 8080
+      env:
+        - name: FLASK_APP
+          value: app.py
+        - name: FLASK_ENV
+          value: development
+        - name: SECRET_KEY
+          value: algumseguredo
+        - name: FRONTEND_URL
+          value: http://localhost:8080
+        - name: OAUTHLIB_INSECURE_TRANSPORT
+          value: '1'
+        - name: GOOGLE_CLIENT_SECRETS
+          valueFrom:
+            secretKeyRef:
+              key: '1'
+              name: GOOGLE_CLIENT_SECRETS
+        - name: GOOGLE_CLIENT_ID
+          valueFrom:
+            secretKeyRef:
+              key: '1'
+              name: GOOGLE_CLIENT_ID
+        - name: MONGO_URI
+          valueFrom:
+            secretKeyRef:
+              key: '1'
+              name: MONGO_URI
+  
     steps:
       - name: Git Checkout
         uses: actions/checkout@v3
