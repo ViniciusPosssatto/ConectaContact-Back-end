@@ -27,3 +27,16 @@ def read_validator_schema_for_models(directory, collection):
     except Exception as excp:
         print("Erro na leitura do json: " + excp)
         return None
+
+
+def get_domains(results):
+    emails = []
+    for i in results:
+        emails.append(i.get("email"))
+    
+    domains = []
+    for i in emails:
+        domain = i[i.index("@"):]
+        if domain not in domains:
+            domains.append(domain)
+    return domains
