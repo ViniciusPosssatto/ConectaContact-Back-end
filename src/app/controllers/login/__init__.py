@@ -29,7 +29,7 @@ flow = Flow.from_client_config(
     	"https://www.googleapis.com/auth/contacts.readonly",
       "openid",
     ],
-    redirect_uri="https://conectacontactbackend-myb7gebzdq-rj.a.run.app/login/callback",
+    redirect_uri="http://127.0.0.1:5000/login/callback",
 )
 
 
@@ -106,17 +106,32 @@ def callback():
 		
 		verify_and_save_contacts(contacts, user.get("_id"))
 
-		# res = service.people().otherContacts().list(
-		# 	pageSize=10, 
-		# 	readMask="names,emailAddresses,photos"
-		# ).execute()
+		results_others = service.otherContacts().list(
+			pageSize=1000, 
+			readMask="names,emailAddresses,photos"
+		).execute()
+		connections_others = results_others.get('otherContacts', [])
+
+		contacts_others = []
+		for person in connections_others:
+			names = person.get('names', [])
+			email = person.get('emailAddresses', [])
+			photo = person.get("photos", [])
+			if email:
+				if not person.get("names"):
+					name = email[0].get("value")
+					contacts_others.append({"name": name, "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("_id")})
+				else:
+					contacts_others.append({"name": names[0].get('displayName'), "email": email[0].get("value"), "photo": photo[0].get("url"), "id_user": user.get("_id")})
+
+		verify_and_save_contacts(contacts_others, user.get("_id"))
 
 		user_google_dict["id_user"] = str(user.get("_id"))
 		
 		token = generate_token_jwt(user_google_dict)
 
 		return Response(
-		response=json_util.dumps(contacts),
+		response=json_util.dumps(contacts_others),
 		status=200,
 		mimetype="application/json",
 	)
