@@ -18,7 +18,7 @@ from src.app.services import verify_and_save_contacts, insert_user_in_db, get_us
 
 login = Blueprint("login", __name__,  url_prefix="/login")
 
-CLIENT_SECRETS_OBJECT = os.getenv.get("GOOGLE_CLIENT_SECRETS")
+CLIENT_SECRETS_OBJECT = os.getenv("GOOGLE_CLIENT_SECRETS")
 
 flow = Flow.from_client_config(
     client_config=json.loads(CLIENT_SECRETS_OBJECT),
