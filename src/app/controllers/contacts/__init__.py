@@ -10,8 +10,14 @@ contacts = Blueprint("contacts", __name__,  url_prefix="/contacts")
 
 @contacts.route("/<id_user>", methods=["GET"])
 def contacts_list(id_user):
-
-    results = get_contacts_exists(id_user)
+    try:
+        results = get_contacts_exists(id_user)
+    except Exception as exp:
+        return Response(
+        response=json_util.dumps({"erro": "Não foi possível acessar este ID ou usuário não existe"}),
+        status=400,
+        mimetype="application/json",
+    )
 
     return Response(
         response=json_util.dumps({"results": results}),
@@ -22,9 +28,17 @@ def contacts_list(id_user):
 
 @contacts.route("/domain/<id_user>", methods=["GET"])
 def domain_list(id_user):
+    try:
+        results = get_emails_contact(id_user)
 
-    results = get_emails_contact(id_user)
-    domains = get_domains(results)
+        domains = get_domains(results)
+    except Exception as exp:
+        return Response(
+        response=json_util.dumps({"erro": "Não foi possível acessar este ID ou usuário não existe"}),
+        status=400,
+        mimetype="application/json",
+    )
+
     return Response(
         response=json_util.dumps({"domains": domains}),
         status=200,
