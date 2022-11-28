@@ -8,6 +8,7 @@ env:
   FLASK_APP: ${{ secrets.FLASK_APP }}
   FLASK_ENV: ${{ secrets.FLASK_ENV }}
   FLASK_DEBUG: ${{ secrets.FLASK_DEBUG }}
+  GOOGLE_CLIENT_SECRETS: ${{ secrets.GOOGLE_CLIENT_SECRETS}}
   SECRET_KEY: ${{ secrets.SECRET_KEY }}
   MONGO_URI: ${{ secrets.MONGO_URI }}
   GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
