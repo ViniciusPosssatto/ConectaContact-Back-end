@@ -1,0 +1,53 @@
+name: CI-PR 
+
+on:
+  pull_request:
+    types: [opened]
+
+env:
+  FLASK_APP: ${{ secrets.FLASK_APP }}
+  FLASK_ENV: ${{ secrets.FLASK_ENV }}
+  FLASK_DEBUG: ${{ secrets.FLASK_DEBUG }}
+  SECRET_KEY: ${{ secrets.SECRET_KEY }}
+  MONGO_URI: ${{ secrets.MONGO_URI }}
+  GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+  OAUTHLIB_INSECURE_TRANSPORT: ${{ secrets.OAUTHLIB_INSECURE_TRANSPORT }}
+  FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+  BACKEND_URL: ${{ secrets.BACKEND_URL }}
+  
+
+jobs:
+
+  tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [ 3.9.15 ]
+
+    steps:
+
+    - uses: actions/checkout@master
+
+    - name: Initialize Python 
+      uses: actions/setup-python@v1
+      with:
+        python-version: ${{matrix.python-version}}
+
+    - name: Install/update pip
+      run: |
+        python -m pip install --upgrade pip
+    
+    - name: Create and start virtual environment
+      run: |
+        python3 -m venv venv
+        source venv/bin/activate
+
+    - name: Install dependencies
+      run: |
+        pip install -r requirements.txt  
+
+    - name: Run unit tests with coverage report
+      run: |
+        pytest tests/ -v -W ignore::DeprecationWarning --cov

@@ -13,7 +13,7 @@ class Development(object):
 
 
 class Testing(object):
-    TESTING = False
+    TESTING = True
     FLASK_DEBUG = os.getenv('FLASK_DEBUG')
     SECRET_KEY = os.getenv('SECRET_KEY')
     MONGO_URI = os.getenv('MONGO_URI')
@@ -21,5 +21,5 @@ class Testing(object):
 
 app_config = {
     "development" : Development,
-    "production": Testing
+    "testing": Testing
 }
