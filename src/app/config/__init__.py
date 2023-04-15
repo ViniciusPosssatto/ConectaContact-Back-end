@@ -20,6 +20,6 @@ class Testing(object):
 
 
 app_config = {
-    "development" : Development,
+    "development": Development,
     "testing": Testing
 }
