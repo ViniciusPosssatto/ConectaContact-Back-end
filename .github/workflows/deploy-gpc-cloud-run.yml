@@ -42,4 +42,4 @@ jobs:
         run: gcloud builds submit --tag $IMAGE_NAME .
 
       - name : Deploy Docker Image
-        run: gcloud run deploy conectacontactbackend --image $IMAGE_NAME --PORT 8080 --project $GCP_PROJECT_ID --allow-unauthenticated --platform managed --region $RUN_REGION
+        run: gcloud run deploy conectacontactbackend --image $IMAGE_NAME --port 8080 --project $GCP_PROJECT_ID --allow-unauthenticated --platform managed --region $RUN_REGION
