@@ -121,7 +121,7 @@ Ex:
 ]
 ```
 
-4. `[GET] /contacts/domain/ < id_user > (contacts)`
+4. ` [GET] /contacts/domain/ < id_user > (contacts) `
 
 -  retorna uma lista com todos os domínios dos emails dos contatos salvos na database do usuário vinculado ao ID enviado como query param (obrigatório).
 
